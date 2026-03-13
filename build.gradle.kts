@@ -11,10 +11,8 @@ group = "hexlet.code"
 version = "0.0.1-SNAPSHOT"
 description = "Task Manager"
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+application {
+	mainClass = "hexlet.code.demo.AppApplication"
 }
 
 configurations {
