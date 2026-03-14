@@ -36,8 +36,19 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-security-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 
+	implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
+	testCompileOnly("org.projectlombok:lombok")
+	testAnnotationProcessor("org.projectlombok:lombok")
+
+	implementation("org.mapstruct:mapstruct:1.5.5.Final")
+	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+	testAnnotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+
+	annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+	testAnnotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 
 	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.postgresql:postgresql")
