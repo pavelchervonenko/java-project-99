@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
@@ -30,9 +29,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+
 @SpringBootTest
 @AutoConfigureMockMvc
-@WithMockUser
 public class UserControllerTest {
 
     @Autowired
@@ -63,7 +63,7 @@ public class UserControllerTest {
 
     @Test
     public void testIndex() throws Exception {
-        var response = mockMvc.perform(get("/users"))
+        var response = mockMvc.perform(get("/api/users").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
@@ -78,7 +78,7 @@ public class UserControllerTest {
 
     @Test
     public void testShow() throws Exception {
-        var response = mockMvc.perform(get("/users/" + testUser.getId()))
+        var response = mockMvc.perform(get("/api/users/" + testUser.getId()).with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
@@ -99,7 +99,8 @@ public class UserControllerTest {
         data.put("email", "jane@example.com");
         data.put("password", "secret123");
 
-        var request = post("/users")
+        var request = post("/api/users")
+                .with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
@@ -122,7 +123,8 @@ public class UserControllerTest {
         data.put("email", "jack@yahoo.com");
         data.put("password", "new-password");
 
-        var request = put("/users/" + testUser.getId())
+        var request = put("/api/users/" + testUser.getId())
+                .with(jwt().jwt(j -> j.subject("john@example.com")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
@@ -134,7 +136,8 @@ public class UserControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        mockMvc.perform(delete("/users/" + testUser.getId()))
+        mockMvc.perform(delete("/api/users/" + testUser.getId())
+                        .with(jwt().jwt(j -> j.subject("john@example.com"))))
                 .andExpect(status().isNoContent());
 
         assertThat(userRepository.findById(testUser.getId())).isEmpty();
