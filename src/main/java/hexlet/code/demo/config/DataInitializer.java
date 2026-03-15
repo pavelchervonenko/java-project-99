@@ -22,7 +22,7 @@ public class DataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        if (userRepository.findByEmail("hexlet@example.com") == null) {
+        if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
             var user = new User();
             user.setFirstName("admin");
             user.setLastName("admin");
