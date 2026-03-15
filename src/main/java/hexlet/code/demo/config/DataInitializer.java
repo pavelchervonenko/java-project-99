@@ -24,6 +24,8 @@ public class DataInitializer implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         if (userRepository.findByEmail("hexlet@example.com") == null) {
             var user = new User();
+            user.setFirstName("admin");
+            user.setLastName("admin");
             user.setEmail("hexlet@example.com");
             user.setPassword(passwordEncoder.encode("qwerty"));
             userRepository.save(user);
