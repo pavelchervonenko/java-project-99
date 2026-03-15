@@ -11,7 +11,11 @@ import hexlet.code.demo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,6 +57,12 @@ public class UserService {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
 
+        var currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (!user.getEmail().equals(currentEmail)) {
+            throw new AccessDeniedException("Access denied");
+        }
+
         userMapper.updateEntityFromDTO(dto, user);
 
         if (dto.getPassword() != null) {
@@ -67,6 +77,12 @@ public class UserService {
     public void deleteUser(Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
+
+        var currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (!user.getEmail().equals(currentEmail)) {
+            throw new AccessDeniedException("Access denied");
+        }
 
         userRepository.delete(user);
     }
