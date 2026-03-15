@@ -44,6 +44,9 @@ out/
 ### Mac OS ###
 .DS_Store
 
+### RSA keys ###
+src/main/resources/certs/
+
 # JTE generated files
 jte-classes/
 app/jte-classes/
