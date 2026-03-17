@@ -49,6 +49,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
         return userService.updateUser(id, dto);
     }
