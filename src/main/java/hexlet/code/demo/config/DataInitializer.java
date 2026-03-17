@@ -1,6 +1,9 @@
 package hexlet.code.demo.config;
 
+import hexlet.code.demo.model.TaskStatus;
 import hexlet.code.demo.model.User;
+
+import hexlet.code.demo.repository.TaskStatusRepository;
 import hexlet.code.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -12,11 +15,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements ApplicationRunner {
 
     private final UserRepository userRepository;
+
+    private final TaskStatusRepository taskStatusRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -30,5 +37,22 @@ public class DataInitializer implements ApplicationRunner {
             user.setPassword(passwordEncoder.encode("qwerty"));
             userRepository.save(user);
         }
+
+        var defaultStatuses = Map.of(
+                "draft", "Draft",
+                "to_review", "To Review",
+                "to_be_fixed", "To Be Fixed",
+                "to_publish", "To Publish",
+                "published", "Published"
+        );
+
+        defaultStatuses.forEach((slug, name) -> {
+            if (taskStatusRepository.findBySlug(slug) == null) {
+                var status = new TaskStatus();
+                status.setName(name);
+                status.setSlug(slug);
+                taskStatusRepository.save(status);
+            }
+        });
     }
 }
