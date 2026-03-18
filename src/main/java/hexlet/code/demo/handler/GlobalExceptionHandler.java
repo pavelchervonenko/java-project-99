@@ -1,5 +1,7 @@
 package hexlet.code.demo.handler;
 
+import hexlet.code.demo.exception.ResourceAssociationException;
+import hexlet.code.demo.exception.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.http.HttpStatus;
@@ -27,5 +29,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public void handleAuthenticationException() {
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void handleResourceNotFoundException() {
+    }
+
+    @ExceptionHandler(ResourceAssociationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public void handleResourceAssociationException() {
     }
 }
