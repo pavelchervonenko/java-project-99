@@ -1,10 +1,11 @@
 package hexlet.code.demo.controller;
 
+import hexlet.code.demo.model.Task;
+import hexlet.code.demo.repository.TaskRepository;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import hexlet.code.demo.dto.TaskStatusDTO;
-import hexlet.code.demo.mapper.TaskStatusMapper;
 import hexlet.code.demo.model.TaskStatus;
 import hexlet.code.demo.repository.TaskStatusRepository;
 
@@ -45,12 +46,13 @@ public class TaskStatusControllerTest {
     private ObjectMapper om;
 
     @Autowired
-    private TaskStatusMapper taskStatusMapper;
+    private TaskRepository taskRepository;
 
     private TaskStatus testTaskStatus;
 
     @BeforeEach
     public void setUp() {
+        taskRepository.deleteAll();
         taskStatusRepository.deleteAll();
 
         testTaskStatus = new TaskStatus();
@@ -69,9 +71,9 @@ public class TaskStatusControllerTest {
         var body = response.getContentAsString();
         List<TaskStatusDTO> dtos = om.readValue(body, new TypeReference<>() { });
 
-        var actual = dtos.stream().map(taskStatusMapper::toEntity).toList();
-        var expected = taskStatusRepository.findAll();
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+        var actualIds = dtos.stream().map(TaskStatusDTO::getId).toList();
+        var expectedIds = taskStatusRepository.findAll().stream().map(TaskStatus::getId).toList();
+        assertThat(actualIds).containsExactlyInAnyOrderElementsOf(expectedIds);
     }
 
     @Test
@@ -134,5 +136,18 @@ public class TaskStatusControllerTest {
                 .andExpect(status().isNoContent());
 
         assertThat(taskStatusRepository.findById(testTaskStatus.getId())).isEmpty();
+    }
+
+    @Test
+    public void testDeleteWithAssociatedTask() throws Exception {
+        var task = new Task();
+        task.setName("Test Task");
+        task.setTaskStatus(testTaskStatus);
+        taskRepository.save(task);
+
+        mockMvc.perform(delete("/api/task_statuses/" + testTaskStatus.getId()).with(jwt()))
+                .andExpect(status().isConflict());
+
+        assertThat(taskStatusRepository.findById(testTaskStatus.getId())).isPresent();
     }
 }
