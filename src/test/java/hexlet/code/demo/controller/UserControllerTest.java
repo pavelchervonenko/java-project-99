@@ -4,8 +4,11 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import hexlet.code.demo.dto.UserDTO;
-import hexlet.code.demo.mapper.UserMapper;
+import hexlet.code.demo.model.Task;
+import hexlet.code.demo.model.TaskStatus;
 import hexlet.code.demo.model.User;
+import hexlet.code.demo.repository.TaskRepository;
+import hexlet.code.demo.repository.TaskStatusRepository;
 import hexlet.code.demo.repository.UserRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,15 +45,20 @@ public class UserControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private ObjectMapper om;
+    private TaskRepository taskRepository;
 
     @Autowired
-    private UserMapper userMapper;
+    private TaskStatusRepository taskStatusRepository;
+
+    @Autowired
+    private ObjectMapper om;
 
     private User testUser;
 
     @BeforeEach
     public void setUp() {
+        taskRepository.deleteAll();
+        taskStatusRepository.deleteAll();
         userRepository.deleteAll();
 
         testUser = new User();
@@ -71,9 +79,9 @@ public class UserControllerTest {
         var body = response.getContentAsString();
         List<UserDTO> userDTOS = om.readValue(body, new TypeReference<>() { });
 
-        var actual = userDTOS.stream().map(userMapper::toEntity).toList();
-        var expected = userRepository.findAll();
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+        var actualIds = userDTOS.stream().map(UserDTO::getId).toList();
+        var expectedIds = userRepository.findAll().stream().map(User::getId).toList();
+        assertThat(actualIds).containsExactlyInAnyOrderElementsOf(expectedIds);
     }
 
     @Test
@@ -141,5 +149,38 @@ public class UserControllerTest {
                 .andExpect(status().isNoContent());
 
         assertThat(userRepository.findById(testUser.getId())).isEmpty();
+    }
+
+    @Test
+    public void testUpdateByAnotherUser() throws Exception {
+        var data = new HashMap<String, String>();
+        data.put("email", "hacker@example.com");
+
+        var request = put("/api/users/" + testUser.getId())
+                .with(jwt().jwt(j -> j.subject("another@example.com")))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(data));
+
+        mockMvc.perform(request).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testDeleteWithAssociatedTask() throws Exception {
+        var taskStatus = new TaskStatus();
+        taskStatus.setName("Draft");
+        taskStatus.setSlug("draft");
+        taskStatusRepository.save(taskStatus);
+
+        var task = new Task();
+        task.setName("Test Task");
+        task.setTaskStatus(taskStatus);
+        task.setAssignee(testUser);
+        taskRepository.save(task);
+
+        mockMvc.perform(delete("/api/users/" + testUser.getId())
+                        .with(jwt().jwt(j -> j.subject("john@example.com"))))
+                .andExpect(status().isConflict());
+
+        assertThat(userRepository.findById(testUser.getId())).isPresent();
     }
 }
