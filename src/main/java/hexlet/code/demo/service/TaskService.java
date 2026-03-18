@@ -1,0 +1,72 @@
+package hexlet.code.demo.service;
+
+import hexlet.code.demo.dto.TaskCreateDTO;
+import hexlet.code.demo.dto.TaskDTO;
+import hexlet.code.demo.dto.TaskUpdateDTO;
+
+import hexlet.code.demo.exception.ResourceNotFoundException;
+
+import hexlet.code.demo.mapper.TaskMapper;
+
+import hexlet.code.demo.repository.TaskRepository;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
+
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class TaskService {
+
+    private final TaskRepository taskRepository;
+
+    private final TaskMapper taskMapper;
+
+    @Transactional(readOnly = true)
+    public TaskDTO getTaskById(Long id) {
+        var task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
+        return taskMapper.toDTO(task);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TaskDTO> getAllTasks() {
+        var tasks = taskRepository.findAll();
+        return tasks.stream()
+                .map(taskMapper::toDTO)
+                .toList();
+    }
+
+    @Transactional
+    public TaskDTO createTask(TaskCreateDTO dto) {
+        var task = taskMapper.toEntity(dto);
+
+        taskRepository.save(task);
+
+        return taskMapper.toDTO(task);
+    }
+
+    @Transactional
+    public TaskDTO updateTask(Long id, TaskUpdateDTO dto) {
+        var task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
+
+        taskMapper.updateEntityFromDTO(dto, task);
+
+        taskRepository.save(task);
+
+        return taskMapper.toDTO(task);
+    }
+
+    @Transactional
+    public void deleteTask(Long id) {
+        if (!taskRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Task with id " + id + " not found");
+        }
+        taskRepository.deleteById(id);
+    }
+}
