@@ -16,8 +16,6 @@ public interface TaskStatusMapper {
 
     TaskStatus toEntity(TaskStatusCreateDTO dto);
 
-    TaskStatus toEntity(TaskStatusDTO dto);
-
     TaskStatusDTO toDTO(TaskStatus model);
 
     void updateEntityFromDTO(TaskStatusUpdateDTO dto, @MappingTarget TaskStatus model);
