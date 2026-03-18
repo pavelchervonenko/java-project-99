@@ -47,7 +47,7 @@ public class DataInitializer implements ApplicationRunner {
         );
 
         defaultStatuses.forEach((slug, name) -> {
-            if (taskStatusRepository.findBySlug(slug) == null) {
+            if (taskStatusRepository.findBySlug(slug).isEmpty()) {
                 var status = new TaskStatus();
                 status.setName(name);
                 status.setSlug(slug);
