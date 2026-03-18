@@ -39,7 +39,7 @@ public class UserController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> index() {
-        return userService.getUsersAll();
+        return userService.getAllUsers();
     }
 
     @PostMapping

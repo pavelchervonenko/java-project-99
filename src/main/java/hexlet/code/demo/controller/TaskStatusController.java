@@ -40,7 +40,7 @@ public class TaskStatusController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<TaskStatusDTO> index() {
-        return taskStatusService.getTaskStatusAll();
+        return taskStatusService.getAllTaskStatuses();
     }
 
     @PostMapping
