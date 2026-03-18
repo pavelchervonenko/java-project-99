@@ -3,6 +3,7 @@ package hexlet.code.demo.mapper;
 import hexlet.code.demo.exception.ResourceNotFoundException;
 
 import hexlet.code.demo.model.BaseEntity;
+import hexlet.code.demo.model.Label;
 import hexlet.code.demo.model.TaskStatus;
 
 import hexlet.code.demo.repository.TaskStatusRepository;
@@ -14,6 +15,8 @@ import org.mapstruct.Named;
 
 import org.mapstruct.TargetType;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING
@@ -39,5 +42,15 @@ public abstract class ReferenceMapper {
     @Named("toSlug")
     public String toSlug(TaskStatus taskStatus) {
         return taskStatus == null ? null : taskStatus.getSlug();
+    }
+
+    @Named("labelToIds")
+    public List<Long> labelsToIds(List<Label> labels) {
+        if (labels == null) {
+            return List.of();
+        }
+        return labels.stream()
+                .map(Label::getId)
+                .toList();
     }
 }

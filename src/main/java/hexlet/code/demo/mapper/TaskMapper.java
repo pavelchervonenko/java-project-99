@@ -20,15 +20,18 @@ public interface TaskMapper {
     @Mapping(target = "taskStatus", source = "status", qualifiedByName = "toTaskStatus")
     @Mapping(target = "name", source = "title")
     @Mapping(target = "description", source = "content")
+    @Mapping(target = "labels", ignore = true)
     Task toEntity(TaskCreateDTO dto);
 
     @Mapping(target = "assigneeId", source = "assignee.id")
     @Mapping(target = "status", source = "taskStatus", qualifiedByName = "toSlug")
     @Mapping(target = "title", source = "name")
     @Mapping(target = "content", source = "description")
+    @Mapping(target = "labelIds", source = "labels", qualifiedByName = "labelToIds")
     TaskDTO toDTO(Task model);
 
     @Mapping(target = "name", source = "title")
     @Mapping(target = "description", source = "content")
+    @Mapping(target = "labels", ignore = true)
     void updateEntityFromDTO(TaskUpdateDTO dto, @MappingTarget Task model);
 }
