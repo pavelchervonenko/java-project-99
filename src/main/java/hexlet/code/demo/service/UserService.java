@@ -4,11 +4,13 @@ import hexlet.code.demo.dto.UserCreateDTO;
 import hexlet.code.demo.dto.UserUpdateDTO;
 import hexlet.code.demo.dto.UserDTO;
 
+import hexlet.code.demo.exception.ResourceAssociationException;
+import hexlet.code.demo.exception.ResourceNotFoundException;
+
 import hexlet.code.demo.mapper.UserMapper;
 
+import hexlet.code.demo.model.User;
 import hexlet.code.demo.repository.UserRepository;
-
-import jakarta.persistence.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,20 +34,30 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private void checkCurrentUser(User user) {
+        var currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!user.getEmail().equals(currentEmail)) {
+            throw new AccessDeniedException("Access denied");
+        }
+    }
+
+    @Transactional(readOnly = true)
     public UserDTO getUserById(Long id) {
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         return userMapper.toDTO(user);
 
     }
 
-    public List<UserDTO> getUsersAll() {
+    @Transactional(readOnly = true)
+    public List<UserDTO> getAllUsers() {
         var users = userRepository.findAll();
         return users.stream()
                 .map(userMapper::toDTO)
                 .toList();
     }
 
+    @Transactional
     public UserDTO createUser(UserCreateDTO dto) {
         var user = userMapper.toEntity(dto);
 
@@ -53,19 +67,16 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
+    @Transactional
     public UserDTO updateUser(Long id, UserUpdateDTO dto) {
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
 
-        var currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        if (!user.getEmail().equals(currentEmail)) {
-            throw new AccessDeniedException("Access denied");
-        }
+        checkCurrentUser(user);
 
         userMapper.updateEntityFromDTO(dto, user);
 
-        if (dto.getPassword() != null) {
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
@@ -74,14 +85,15 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
+    @Transactional
     public void deleteUser(Long id) {
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
 
-        var currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        checkCurrentUser(user);
 
-        if (!user.getEmail().equals(currentEmail)) {
-            throw new AccessDeniedException("Access denied");
+        if (!user.getTasksList().isEmpty()) {
+            throw new ResourceAssociationException("User with id " + id + " is associated with tasks");
         }
 
         userRepository.delete(user);
