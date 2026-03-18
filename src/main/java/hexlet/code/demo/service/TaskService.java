@@ -8,6 +8,7 @@ import hexlet.code.demo.exception.ResourceNotFoundException;
 
 import hexlet.code.demo.mapper.TaskMapper;
 
+import hexlet.code.demo.repository.LabelRepository;
 import hexlet.code.demo.repository.TaskRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ import java.util.List;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+
+    private final LabelRepository labelRepository;
 
     private final TaskMapper taskMapper;
 
@@ -45,6 +48,9 @@ public class TaskService {
     public TaskDTO createTask(TaskCreateDTO dto) {
         var task = taskMapper.toEntity(dto);
 
+        var labels = labelRepository.findAllById(dto.getLabelIds());
+        task.setLabels(labels);
+
         taskRepository.save(task);
 
         return taskMapper.toDTO(task);
@@ -56,6 +62,9 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
 
         taskMapper.updateEntityFromDTO(dto, task);
+
+        var labels = labelRepository.findAllById(dto.getLabelIds());
+        task.setLabels(labels);
 
         taskRepository.save(task);
 
