@@ -42,7 +42,10 @@ public class SecurityConfig {
                                 "/api/task_statuses",
                                 "/api/task_statuses/{id}",
                                 "/api/users/{id}",
-                                "/api/users").permitAll()
+                                "/api/users",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
