@@ -26,6 +26,8 @@ jobs:
           fetch-depth: 0
 
       - name: Execute Gradle build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: ./gradlew build
 
       - name: Generate coverage report
