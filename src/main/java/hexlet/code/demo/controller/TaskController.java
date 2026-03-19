@@ -2,7 +2,7 @@ package hexlet.code.demo.controller;
 
 import hexlet.code.demo.dto.TaskCreateDTO;
 import hexlet.code.demo.dto.TaskDTO;
-
+import hexlet.code.demo.dto.TaskParamsDTO;
 import hexlet.code.demo.dto.TaskUpdateDTO;
 import hexlet.code.demo.service.TaskService;
 
@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -38,8 +39,8 @@ public class TaskController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<TaskDTO> index() {
-        return taskService.getAllTasks();
+    public List<TaskDTO> index(@ModelAttribute TaskParamsDTO params) {
+        return taskService.getAllTasks(params);
     }
 
     @PostMapping
