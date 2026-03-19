@@ -28,6 +28,7 @@ public class SecurityConfig {
     private final CustomUserDetailService userDetailService;
 
     @Bean
+    @SuppressWarnings("java:S4502") // CSRF disabled intentionally: stateless JWT-based API, no session cookies
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
