@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,9 +39,11 @@ public class TaskStatusController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<TaskStatusDTO> index() {
-        return taskStatusService.getAllTaskStatuses();
+    public ResponseEntity<List<TaskStatusDTO>> index() {
+        var statuses = taskStatusService.getAllTaskStatuses();
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(statuses.size()))
+                .body(statuses);
     }
 
     @PostMapping

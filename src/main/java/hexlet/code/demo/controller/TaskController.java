@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,9 +39,11 @@ public class TaskController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<TaskDTO> index(@ModelAttribute TaskParamsDTO params) {
-        return taskService.getAllTasks(params);
+    public ResponseEntity<List<TaskDTO>> index(@ModelAttribute TaskParamsDTO params) {
+        var tasks = taskService.getAllTasks(params);
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(tasks.size()))
+                .body(tasks);
     }
 
     @PostMapping
