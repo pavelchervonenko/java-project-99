@@ -4,10 +4,14 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import hexlet.code.demo.dto.TaskDTO;
+import hexlet.code.demo.model.Label;
 import hexlet.code.demo.model.Task;
 import hexlet.code.demo.model.TaskStatus;
+import hexlet.code.demo.model.User;
+import hexlet.code.demo.repository.LabelRepository;
 import hexlet.code.demo.repository.TaskRepository;
 import hexlet.code.demo.repository.TaskStatusRepository;
+import hexlet.code.demo.repository.UserRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,25 +50,58 @@ public class TaskControllerTest {
     private TaskStatusRepository taskStatusRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
     private ObjectMapper om;
 
     private Task testTask;
+    private Task otherTask;
     private TaskStatus testTaskStatus;
+    private TaskStatus otherTaskStatus;
+    private User testUser;
+    private Label testLabel;
 
     @BeforeEach
     public void setUp() {
         taskRepository.deleteAll();
         taskStatusRepository.deleteAll();
+        userRepository.deleteAll();
+        labelRepository.deleteAll();
 
         testTaskStatus = new TaskStatus();
         testTaskStatus.setName("Draft");
         testTaskStatus.setSlug("draft");
         taskStatusRepository.save(testTaskStatus);
 
+        otherTaskStatus = new TaskStatus();
+        otherTaskStatus.setName("Published");
+        otherTaskStatus.setSlug("published");
+        taskStatusRepository.save(otherTaskStatus);
+
+        testUser = new User();
+        testUser.setEmail("user@test.com");
+        testUser.setPassword("password123");
+        userRepository.save(testUser);
+
+        testLabel = new Label();
+        testLabel.setName("bug");
+        labelRepository.save(testLabel);
+
         testTask = new Task();
-        testTask.setName("Test Task");
+        testTask.setName("Fix login bug");
         testTask.setTaskStatus(testTaskStatus);
+        testTask.setAssignee(testUser);
+        testTask.setLabels(List.of(testLabel));
         taskRepository.save(testTask);
+
+        otherTask = new Task();
+        otherTask.setName("Add new feature");
+        otherTask.setTaskStatus(otherTaskStatus);
+        taskRepository.save(otherTask);
     }
 
     @Test
@@ -160,5 +197,55 @@ public class TaskControllerTest {
                 .content(om.writeValueAsString(data));
 
         mockMvc.perform(request).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testIndexFilterByTitleCont() throws Exception {
+        var response = mockMvc.perform(get("/api/tasks").param("titleCont", "login").with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        List<TaskDTO> dtos = om.readValue(response.getContentAsString(), new TypeReference<>() { });
+
+        assertThat(dtos).hasSize(1);
+        assertThat(dtos.get(0).getId()).isEqualTo(testTask.getId());
+    }
+
+    @Test
+    public void testIndexFilterByStatus() throws Exception {
+        var response = mockMvc.perform(get("/api/tasks").param("status", "draft").with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        List<TaskDTO> dtos = om.readValue(response.getContentAsString(), new TypeReference<>() { });
+
+        assertThat(dtos).hasSize(1);
+        assertThat(dtos.get(0).getId()).isEqualTo(testTask.getId());
+    }
+
+    @Test
+    public void testIndexFilterByAssigneeId() throws Exception {
+        var response = mockMvc.perform(get("/api/tasks")
+                        .param("assigneeId", testUser.getId().toString()).with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        List<TaskDTO> dtos = om.readValue(response.getContentAsString(), new TypeReference<>() { });
+
+        assertThat(dtos).hasSize(1);
+        assertThat(dtos.get(0).getId()).isEqualTo(testTask.getId());
+    }
+
+    @Test
+    public void testIndexFilterByLabelId() throws Exception {
+        var response = mockMvc.perform(get("/api/tasks")
+                        .param("labelId", testLabel.getId().toString()).with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        List<TaskDTO> dtos = om.readValue(response.getContentAsString(), new TypeReference<>() { });
+
+        assertThat(dtos).hasSize(1);
+        assertThat(dtos.get(0).getId()).isEqualTo(testTask.getId());
     }
 }
