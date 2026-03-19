@@ -49,6 +49,9 @@ package-lock.json
 ### Mac OS ###
 .DS_Store
 
+### Env ###
+.env
+
 ### RSA keys ###
 src/main/resources/certs/
 
