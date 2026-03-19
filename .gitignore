@@ -55,6 +55,9 @@ package-lock.json
 ### RSA keys ###
 src/main/resources/certs/
 
+### Frontend build ###
+src/main/resources/static/
+
 # JTE generated files
 jte-classes/
 app/jte-classes/
