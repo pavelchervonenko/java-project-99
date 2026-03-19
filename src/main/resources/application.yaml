@@ -9,4 +9,4 @@ rsa:
   public-key: classpath:certs/public.pem
 
 admin:
-  password: ${ADMIN_PASSWORD:qwerty}
+  password: ${ADMIN_PASSWORD}
