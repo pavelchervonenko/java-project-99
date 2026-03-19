@@ -10,6 +10,7 @@ import hexlet.code.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
@@ -32,6 +33,9 @@ public class DataInitializer implements ApplicationRunner {
 
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${admin.password}")
+    private String adminPassword;
+
     @Override
     public void run(ApplicationArguments args) {
         if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
@@ -39,7 +43,7 @@ public class DataInitializer implements ApplicationRunner {
             user.setFirstName("admin");
             user.setLastName("admin");
             user.setEmail("hexlet@example.com");
-            user.setPassword(passwordEncoder.encode("qwerty"));
+            user.setPassword(passwordEncoder.encode(adminPassword));
             userRepository.save(user);
         }
 

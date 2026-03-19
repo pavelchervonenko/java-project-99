@@ -7,3 +7,6 @@ spring:
 rsa:
   private-key: classpath:certs/private.pem
   public-key: classpath:certs/public.pem
+
+admin:
+  password: ${ADMIN_PASSWORD:qwerty}
