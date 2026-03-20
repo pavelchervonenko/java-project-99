@@ -4,11 +4,13 @@ import hexlet.code.demo.dto.UserCreateDTO;
 import hexlet.code.demo.dto.UserDTO;
 import hexlet.code.demo.dto.UserUpdateDTO;
 
+import hexlet.code.demo.repository.UserRepository;
 import hexlet.code.demo.service.UserService;
 
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -29,7 +31,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
+    private static final String ONLY_OWNER_BY_ID = """
+            @userRepository.findById(#id).get().getEmail() == authentication.getName()
+            """;
+
     private final UserService userService;
+
+    private final UserRepository userRepository;
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -53,12 +61,14 @@ public class UserController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize(ONLY_OWNER_BY_ID)
     public UserDTO update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
         return userService.updateUser(id, dto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize(ONLY_OWNER_BY_ID)
     public void delete(@PathVariable Long id) {
         userService.deleteUser(id);
     }
