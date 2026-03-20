@@ -2,16 +2,20 @@ plugins {
 	id("application")
 	id("checkstyle")
 	id("jacoco")
-	id("org.sonarqube") version "7.2.3.7755"
-	id("org.springframework.boot") version "4.0.3"
+	id("org.sonarqube") version "4.4.1.3373"
+	id("org.springframework.boot") version "3.4.3"
 	id("io.spring.dependency-management") version "1.1.7"
-	id("io.sentry.jvm.gradle")version "6.2.0"
+	id("io.sentry.jvm.gradle") version "4.14.0"
 
 }
 
 group = "hexlet.code"
 version = "0.0.1-SNAPSHOT"
 description = "Task Manager"
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+}
 
 application {
 	mainClass = "hexlet.code.demo.AppApplication"
@@ -28,13 +32,10 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
-	testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	testImplementation("org.springframework.security:spring-security-test")
@@ -59,7 +60,7 @@ dependencies {
 
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-	implementation("io.sentry:sentry-async-profiler:8.36.0")
+	implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.19.0")
 }
 
 sentry {
