@@ -56,7 +56,7 @@ public class TaskServiceImpl implements TaskService {
     public TaskDTO createTask(TaskCreateDTO dto) {
         var task = taskMapper.toEntity(dto);
 
-        var labels = labelRepository.findAllById(dto.getLabelIds());
+        var labels = labelRepository.findAllById(dto.getTaskLabelIds());
         task.setLabels(labels);
 
         taskRepository.save(task);
@@ -72,7 +72,7 @@ public class TaskServiceImpl implements TaskService {
 
         taskMapper.updateEntityFromDTO(dto, task);
 
-        var labels = labelRepository.findAllById(dto.getLabelIds());
+        var labels = labelRepository.findAllById(dto.getTaskLabelIds());
         task.setLabels(labels);
 
         taskRepository.save(task);

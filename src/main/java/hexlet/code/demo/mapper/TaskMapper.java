@@ -27,7 +27,7 @@ public interface TaskMapper {
     @Mapping(target = "status", source = "taskStatus", qualifiedByName = "toSlug")
     @Mapping(target = "title", source = "name")
     @Mapping(target = "content", source = "description")
-    @Mapping(target = "labelIds", source = "labels", qualifiedByName = "labelToIds")
+    @Mapping(target = "taskLabelIds", source = "labels", qualifiedByName = "labelToIds")
     TaskDTO toDTO(Task model);
 
     @Mapping(target = "name", source = "title")

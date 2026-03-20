@@ -25,5 +25,5 @@ public class TaskDTO {
 
     private LocalDateTime createdAt;
 
-    private List<Long> labelIds = new ArrayList<>();
+    private List<Long> taskLabelIds = new ArrayList<>();
 }

@@ -16,5 +16,5 @@ public class TaskUpdateDTO {
 
     private String content;
 
-    private List<Long> labelIds = new ArrayList<>();
+    private List<Long> taskLabelIds = new ArrayList<>();
 }

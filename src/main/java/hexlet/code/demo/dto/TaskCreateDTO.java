@@ -24,5 +24,5 @@ public class TaskCreateDTO {
     @NotBlank
     private String status;
 
-    private List<Long> labelIds = new ArrayList<>();
+    private List<Long> taskLabelIds = new ArrayList<>();
 }
