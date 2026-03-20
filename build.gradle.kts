@@ -2,7 +2,7 @@ plugins {
 	id("application")
 	id("checkstyle")
 	id("jacoco")
-	id("org.sonarqube") version "4.4.1.3373"
+	id("org.sonarqube") version "6.3.1.5724"
 	id("org.springframework.boot") version "3.4.3"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("io.sentry.jvm.gradle") version "4.14.0"
@@ -64,10 +64,7 @@ dependencies {
 }
 
 sentry {
-	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
-	// This enables source context, allowing you to see your source
-	// code as part of your stack traces in Sentry.
-	includeSourceContext = true
+	includeSourceContext = System.getenv("SENTRY_AUTH_TOKEN") != null
 
 	org = "my-company-bi0"
 	projectName = "java-spring"
