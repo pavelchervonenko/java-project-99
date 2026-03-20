@@ -10,6 +10,10 @@ import lombok.Setter;
 @Setter
 public class UserUpdateDTO {
 
+    private String firstName;
+
+    private String lastName;
+
     @Email
     private String email;
 
