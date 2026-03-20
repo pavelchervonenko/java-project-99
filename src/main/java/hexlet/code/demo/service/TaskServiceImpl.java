@@ -72,8 +72,10 @@ public class TaskServiceImpl implements TaskService {
 
         taskMapper.updateEntityFromDTO(dto, task);
 
-        var labels = labelRepository.findAllById(dto.getTaskLabelIds());
-        task.setLabels(labels);
+        if (dto.getTaskLabelIds() != null) {
+            var labels = labelRepository.findAllById(dto.getTaskLabelIds());
+            task.setLabels(labels);
+        }
 
         taskRepository.save(task);
 
