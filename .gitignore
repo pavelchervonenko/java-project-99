@@ -53,7 +53,7 @@ package-lock.json
 .env
 
 ### RSA keys ###
-src/main/resources/certs/
+# dev keys are committed intentionally — prod keys are passed via env vars
 
 ### Frontend build ###
 src/main/resources/static/
