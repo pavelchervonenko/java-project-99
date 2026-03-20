@@ -14,4 +14,4 @@ RUN mkdir -p src/main/resources/certs \
 
 RUN gradle installDist
 
-CMD ./build/install/demo/bin/demo
+CMD ./build/install/app/bin/app
