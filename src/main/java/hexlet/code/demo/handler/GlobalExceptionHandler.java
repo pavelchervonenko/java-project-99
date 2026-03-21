@@ -14,41 +14,52 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.stream.Collectors;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public void handleEntityNotFoundException() {
+    public String handleEntityNotFoundException(EntityNotFoundException ex) {
+        return ex.getMessage();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public void handleValidationException() {
+    public String handleValidationException(MethodArgumentNotValidException ex) {
+        return ex.getBindingResult().getFieldErrors().stream()
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .collect(Collectors.joining(", "));
     }
 
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public void handleAuthenticationException() {
+    public String handleAuthenticationException(AuthenticationException ex) {
+        return ex.getMessage();
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public void handleAccessDeniedException() {
+    public String handleAccessDeniedException(AccessDeniedException ex) {
+        return ex.getMessage();
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public void handleResourceNotFoundException() {
+    public String handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return ex.getMessage();
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public void handleDataIntegrityViolationException() {
+    public String handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        return ex.getMessage();
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public void handleGenericException() {
+    public String handleGenericException(Exception ex) {
+        return ex.getMessage();
     }
 }
