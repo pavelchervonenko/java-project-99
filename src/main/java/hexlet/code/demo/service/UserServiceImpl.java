@@ -13,8 +13,6 @@ import hexlet.code.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
@@ -32,13 +30,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     private final PasswordEncoder passwordEncoder;
-
-    private void checkCurrentUser(User user) {
-        var currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!user.getEmail().equals(currentEmail)) {
-            throw new AccessDeniedException("Access denied");
-        }
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -74,8 +65,6 @@ public class UserServiceImpl implements UserService {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
 
-        checkCurrentUser(user);
-
         userMapper.updateEntityFromDTO(dto, user);
 
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
@@ -92,8 +81,6 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-
-        checkCurrentUser(user);
 
         userRepository.delete(user);
     }
