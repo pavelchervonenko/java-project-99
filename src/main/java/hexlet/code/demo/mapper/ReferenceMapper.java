@@ -14,6 +14,7 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
 
 import org.mapstruct.TargetType;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public abstract class ReferenceMapper {
     @Autowired
     private TaskStatusRepository taskStatusRepository;
 
-    @Autowired
+    @PersistenceContext
     private EntityManager entityManager;
 
     public <T extends BaseEntity> T toEntity(Long id, @TargetType Class<T> entityClass) {
