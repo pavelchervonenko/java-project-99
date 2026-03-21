@@ -16,7 +16,7 @@ Task Manager — это веб-приложение для управления 
 ## Технологии
 
 - **Java 21**
-- **Spring Boot 4** — основной фреймворк
+- **Spring Boot 3** — основной фреймворк
 - **Spring Security + JWT** — аутентификация
 - **Spring Data JPA / Hibernate** — работа с базой данных
 - **PostgreSQL** — база данных (production)
