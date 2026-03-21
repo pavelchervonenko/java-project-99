@@ -181,6 +181,42 @@ public class TaskControllerTest {
     }
 
     @Test
+    public void testUpdatePreservesAssignee() throws Exception {
+        var data = new HashMap<String, String>();
+        data.put("title", "Updated title");
+
+        var request = put("/api/tasks/" + testTask.getId())
+                .with(jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(data));
+
+        mockMvc.perform(request).andExpect(status().isOk());
+
+        var updated = taskRepository.findById(testTask.getId()).orElseThrow();
+        assertThat(updated.getAssignee()).isNotNull();
+        assertThat(updated.getAssignee().getId()).isEqualTo(testUser.getId());
+    }
+
+    @Test
+    public void testUpdateAddAssigneeToTaskWithoutOne() throws Exception {
+        var data = new HashMap<>();
+        data.put("title", otherTask.getName());
+        data.put("status", otherTaskStatus.getSlug());
+        data.put("assignee_id", testUser.getId());
+
+        var request = put("/api/tasks/" + otherTask.getId())
+                .with(jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(data));
+
+        mockMvc.perform(request).andExpect(status().isOk());
+
+        var updated = taskRepository.findById(otherTask.getId()).orElseThrow();
+        assertThat(updated.getAssignee()).isNotNull();
+        assertThat(updated.getAssignee().getId()).isEqualTo(testUser.getId());
+    }
+
+    @Test
     public void testShowUnauthenticated() throws Exception {
         mockMvc.perform(get("/api/tasks/" + testTask.getId()))
                 .andExpect(status().isUnauthorized());
