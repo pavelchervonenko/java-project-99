@@ -8,7 +8,6 @@ import hexlet.code.demo.exception.ResourceNotFoundException;
 
 import hexlet.code.demo.mapper.UserMapper;
 
-import hexlet.code.demo.model.User;
 import hexlet.code.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
