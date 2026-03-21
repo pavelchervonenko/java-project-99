@@ -1,5 +1,7 @@
 package hexlet.code.demo.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.NotBlank;
 
 import lombok.Getter;
@@ -14,6 +16,7 @@ public class TaskCreateDTO {
 
     private Long index;
 
+    @JsonProperty("assignee_id")
     private Long assigneeId;
 
     @NotBlank
